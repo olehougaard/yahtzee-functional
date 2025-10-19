@@ -1,0 +1,7 @@
+{
+  "name": "yahtzee",
+  "version": "1.0.0",
+  "workspaces": ["client", "server"],
+  "author": "Ole I Hougaard",
+  "license": "ISC"
+}
