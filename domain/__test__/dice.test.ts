@@ -2,14 +2,14 @@ import { describe, it, expect, beforeEach } from '@jest/globals'
 import { dice_roller, DieValue } from '../src/model/dice'
 import { non_random } from './test_utils'
 
-function dice_sequence(...die_rolls: number[]) {
-    return non_random(...die_rolls.map(n => n - 1))
+export function dice_sequence(...die_rolls: number[]) {
+    return die_rolls.map(n => n - 1)
 }
 
 describe("rolling dice", () => {
     let roller = dice_roller(_ => 0)
     beforeEach(() => {
-        const randomizer = dice_sequence(1, 3, 2, 4, 2)
+        const randomizer = non_random(...dice_sequence(1, 3, 2, 4, 2))
         roller = dice_roller(randomizer)
     })
     it("returns the requested number of dice", () => {
@@ -24,7 +24,7 @@ describe("re-rolling dice", () => {
     let roller = dice_roller(_ => 0)
     let first_roll: DieValue[] = []
     beforeEach(() => {
-        const randomizer = dice_sequence(1, 3, 2, 4, 2, 6, 5, 1, 6, 5)
+        const randomizer = non_random(...dice_sequence(1, 3, 2, 4, 2, 6, 5, 1, 6, 5))
         roller = dice_roller(randomizer)
         first_roll = roller.roll(5)
     })

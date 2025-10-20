@@ -1,5 +1,5 @@
-import { times } from "../utils/array_utils"
 import type { Randomizer } from "../utils/random_utils"
+import * as _ from 'lodash/fp'
 
 export const die_values = [1, 2, 3, 4, 5, 6] as const
 
@@ -18,7 +18,7 @@ export function dice_roller(randomizer: Randomizer): DiceRoller {
     const random_dice = () => randomizer(6) + 1 as DieValue
     return {
         roll(n) {
-            return times(random_dice, n)
+            return _.times(random_dice, n)
         },
         reroll(rolled, held) {
             const s = new Set(held)

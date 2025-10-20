@@ -1,16 +1,17 @@
-import { describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 import { is_finished, new_yahtzee, register, reroll, scores, Yahtzee } from '../src/model/yahtzee.game'
 import { non_random } from './test_utils'
-import { total_lower, total_upper, upper_section } from '../src/model/yahtzee.score'
-import { update } from '../src/utils/array_utils'
+import { total_lower, total_upper } from '../src/model/yahtzee.score'
 import { dice_roller } from '../src/model/dice'
+import { dice_sequence } from './dice.test'
+import * as _ from 'lodash/fp'
 
 describe("new game", () => {
   const yahtzee = new_yahtzee({
     players: ['A', 'B', 'C', 'D'], 
     randomizer: non_random(
       3, 1, 0, // Reversing in Fisher-Yates
-      2, 4, 3, 1, 0 // First roll - one is added to these
+      ...dice_sequence(3, 5, 4, 2, 1) // First roll
     ) 
   })
   it("shuffles the order of players", () => {
@@ -41,8 +42,8 @@ describe("reroll", () => {
     players: ['A', 'B', 'C', 'D'], 
     randomizer: non_random(
       3, 1, 0, // Reversing in Fisher-Yates
-      2, 4, 3, 1, 0, // First roll - one is added to these
-      1, 5, //first re-roll
+      ...dice_sequence(3, 5, 4, 2, 1), // First roll
+      ...dice_sequence(2, 6) //first re-roll
     ) 
   })
   it("replaces the non-held dice", () => {
@@ -61,8 +62,8 @@ describe("reroll", () => {
     players: ['A', 'B', 'C', 'D'], 
     randomizer: non_random(
       3, 1, 0, // Reversing in Fisher-Yates
-      2, 4, 3, 1, 0, // First roll - one is added to these
-      1, 5, //first re-roll
+      ...dice_sequence(3, 5, 4, 2, 1), // First roll
+      ...dice_sequence(2, 6) //first re-roll
     ) 
   })
   it("replaces the non-held dice", () => {
@@ -82,10 +83,10 @@ describe("register", () => {
       players: ['A', 'B', 'C', 'D'], 
       randomizer: non_random(
         3, 1, 0, // Reversing in Fisher-Yates
-        2, 4, 3, 1, 0, // First roll - one is added to these
-        1, 5, //first re-roll
-        2, // second re-roll
-        5, 4, 3, 2, 1, // new re-roll
+      ...dice_sequence(3, 5, 4, 2, 1), // First roll
+      ...dice_sequence(2, 6), //first re-roll
+      ...dice_sequence(3), // second re-roll
+      ...dice_sequence(6, 5, 4, 3, 2) // new re-roll
       ) 
     })
     const rerolled = reroll([1, 2, 3], yahtzee)
@@ -108,13 +109,7 @@ describe("register", () => {
       expect(registered.rolls_left).toEqual(2)
     })
     it("disallows registering an already registered slot", () => {
-      const scores = rerolled_twice.scores
-      const section = scores[0].upper_section
-      const updated_section = { scores: {...section.scores, [2]: 8}}
-      const used = {
-        ...rerolled_twice,
-        scores: update(0, {...scores[0], upper_section: updated_section}, scores)
-      }
+      const used = _.set(['scores', 0, 'upper_section', 'scores', 2], 8, rerolled_twice)
       expect(() => register(2, used)).toThrow()
     })
     it("allows registering before all rerolls are used", () => {
@@ -128,10 +123,10 @@ describe("register", () => {
       players: ['A', 'B', 'C', 'D'], 
       randomizer: non_random(
         3, 1, 0, // Reversing in Fisher-Yates
-        2, 4, 3, 1, 0, // First roll - one is added to these
-        1, 5, //first re-roll
-        2, // second re-roll
-        5, 4, 3, 2, 1, // new re-roll
+      ...dice_sequence(3, 5, 4, 2, 1), // First roll
+      ...dice_sequence(2, 6), //first re-roll
+      ...dice_sequence(3), // second re-roll
+      ...dice_sequence(6, 5, 4, 3, 2) // new re-roll
       ) 
     })
     const rerolled = reroll([1, 2, 3], yahtzee)
@@ -154,17 +149,13 @@ describe("register", () => {
       expect(registered.rolls_left).toEqual(2)
     })
     it("disallows registering an already registered slot", () => {
-      const scores = rerolled_twice.scores
-      const section = scores[0].lower_section
-      const updated_section = { scores: {...section.scores, ['large straight']: 20}}
-      const used = {
-        ...rerolled_twice,
-        scores: update(0, {...scores[0], lower_section: updated_section}, scores)
-      }
+      const used = _.set(['scores', 0, 'lower_section', 'scores', 'large straight'], 20, rerolled_twice)
       expect(() => register('large straight', used)).toThrow()
     })
     it("allows registering before all rerolls are used", () => {
       const registered = register('small straight', yahtzee)
+      console.log(JSON.stringify(yahtzee))
+      console.log(JSON.stringify(registered))
       expect(total_lower(registered.scores[0].lower_section)).toEqual(15)
     })
   })
@@ -231,7 +222,7 @@ describe("scores", () => {
       players: ['A', 'B', 'C', 'D'], 
       randomizer: non_random(
         3, 1, 0, // Reversing in Fisher-Yates
-        2, 4, 3, 1, 0 // First roll - one is added to these
+      ...dice_sequence(3, 5, 4, 2, 1), // First roll
       ) 
     })
     expect(scores(yahtzee)).toEqual([0, 0, 0, 0])

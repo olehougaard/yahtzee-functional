@@ -1,14 +1,14 @@
 import { describe, it, expect } from '@jest/globals'
 import { lower_section, lower_section_keys, LowerSection, register_lower, register_upper, total_lower, total_upper, upper_section, UpperSection } from '../src/model/yahtzee.score'
 import { die_values } from '../src/model/dice'
-import { repeat } from '../src/utils/array_utils'
+import * as _ from 'lodash/fp'
 
 describe("Upper section", () => {
   describe("new", () => {
     const section = upper_section()
 
     it("has undefined for all scores", () => {
-      expect(die_values.map(d => section.scores[d])).toEqual(repeat(undefined, 6))
+      expect(die_values.map(d => section.scores[d])).toEqual(_.times(_.constant(undefined), 6))
     })
 
     it("has undefined bonus", () => {
@@ -18,7 +18,7 @@ describe("Upper section", () => {
 
   describe("registering first score", () => {
     const section = upper_section()
-    const registered = register_upper(section, 3, [3, 1, 3, 2, 6])
+    const registered = register_upper(3, [3, 1, 3, 2, 6], section)
     it("Registers the score in the appropriate slot", () => {
       expect(registered.scores[3]).toEqual(6)
     })
@@ -39,11 +39,11 @@ describe("Upper section", () => {
       }
     }
     it("fills the bonus with 50 if total >= 63", () => {
-      const registered = register_upper(section, 1, [6, 2, 1, 6, 1])
+      const registered = register_upper(1, [6, 2, 1, 6, 1], section)
       expect(registered.bonus).toEqual(50)
     })
     it("fills the bonus with 50 if total < 63", () => {
-      const registered = register_upper(section, 1, [6, 2, 1, 6, 6])
+      const registered = register_upper(1, [6, 2, 1, 6, 6], section)
       expect(registered.bonus).toEqual(0)
     })
   })
@@ -63,7 +63,7 @@ describe("Upper section", () => {
       expect(total_upper(section)).toEqual(6 + 6 + 16 + 15 + 18)
     })
     it("adds the bonus if defined", () => {
-      const registered = register_upper(section, 1, [6, 2, 1, 6, 1])
+      const registered = register_upper(1, [6, 2, 1, 6, 1], section)
       expect(total_upper(registered)).toEqual(2 + 6 + 6 + 16 + 15 + 18 + 50)
     })
   })
@@ -80,11 +80,11 @@ describe("lower section", () => {
   describe("registering a score", () => {
     const section = lower_section()
     it("Registers the score in the appropriate slot", () => {
-      const registered = register_lower(section, 'pair', [3, 1, 3, 2, 6])
+      const registered = register_lower('pair', [3, 1, 3, 2, 6], section)
       expect(registered.scores['pair']).toEqual(6)
     })
     it("Registers the score as 0 if the roll doesn't match the slot", () => {
-      const registered = register_lower(section, 'full house', [3, 1, 3, 2, 6])
+      const registered = register_lower('full house', [3, 1, 3, 2, 6], section)
       expect(registered.scores['full house']).toEqual(0)
     })
   })

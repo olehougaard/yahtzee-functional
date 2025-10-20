@@ -1,5 +1,6 @@
 import { die_values, DieValue } from './dice'
 import { chance_slot, full_house_slot, large_straight_slot, number_slot, pair_slot, quads_slot, score, small_straight_slot, trips_slot, two_pair_slot as two_pairs_slot, yahtzee_slot, type Slot } from './yahtzee.slots'
+import * as _ from 'lodash/fp'
 
 type DieArray<T> = { [key in DieValue]: T }
 
@@ -18,7 +19,7 @@ export type UpperSection = Readonly<{
 }>
 
 function die_array<T>(gen:(n:number) => T): DieArray<T> {
-  return die_values.reduce((o, n) => ({...o, [n]: gen(n)}), {}) as DieArray<T>
+  return _.fromPairs(die_values.map(_.juxt([_.identity, gen]))) as DieArray<T>
 }
 
 function values<T>(dArr: DieArray<T>): T[] {
@@ -32,22 +33,19 @@ export function upper_section(): UpperSection {
 }
 
 export function sum_upper(scores: DieArray<number | undefined>): number {
-  return values(scores)
-    .map(v => v ?? 0)
-    .reduce((s, v) => s + v, 0)
+  return _.sum(values(scores).map(v => v ?? 0))
 }
 
 export function finished_upper(section: UpperSection): boolean {
   return values(section.scores).every(s => s !== undefined)
 }
 
-export function register_upper(section: UpperSection, value: DieValue, roll: DieValue[]): UpperSection {
-  const scores = { ...section.scores, [value]: score(upper_section_slots[value], roll) }
-  if (finished_upper({scores})) {
-    const total = sum_upper(scores)
-    return { ...section, scores, bonus: total >= 63? 50 : 0}
+export function register_upper(value: DieValue, roll: DieValue[], section: UpperSection): UpperSection {
+  const registered = _.set(['scores', value], score(upper_section_slots[value], roll), section)
+  if (finished_upper(registered)) {
+    return _.set('bonus', sum_upper(registered.scores) >= 63? 50 : 0, registered)
   }
-  return { ...section, scores}
+  return registered
 }
 
 export function total_upper(section: UpperSection): number {
@@ -91,15 +89,12 @@ export function finished_lower(section: LowerSection): boolean {
   return lower_section_keys.every(key => section.scores[key] !== undefined)
 }
 
-export function register_lower(section: LowerSection, key: LowerSectionKey, roll: DieValue[]):  LowerSection {
-  const scores = { ...section.scores, [key]: score(lower_section_slots[key], roll) }
-  return {scores}
+export function register_lower(key: LowerSectionKey, roll: DieValue[], section: LowerSection):  LowerSection {
+  return _.set(['scores', key], score(lower_section_slots[key], roll), section)
 }
 
 export function total_lower(section: LowerSection): number {
-  return lower_section_keys
-    .map(k => section.scores[k] ?? 0)
-    .reduce((a, b) => a + b , 0)
+  return _.sum(lower_section_keys.map(k => section.scores[k] ?? 0))
 }
 
 export const slots = {...upper_section_slots, ...lower_section_slots}
