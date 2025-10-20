@@ -53,10 +53,10 @@ export const create_api = (broadcaster: Broadcaster, store: GameStore): API => {
 
   async function update(id: string, player: string, processor: (game: IndexedYahtzee) => IndexedYahtzee)
         : Promise<ServerResponse<IndexedYahtzee, ServerError>> {
-      const game = await store.game(id)
-      const processed = game.filter(g => validPlayer(player, g), _ => Forbidden).map(processor)
-      return processed.asyncFlatMap(game => store.update(game))
-    }
+    const game = await store.game(id)
+    const processed = game.filter(g => validPlayer(player, g), _ => Forbidden).map(processor)
+    return processed.asyncFlatMap(game => store.update(game))
+  }
 
   async function new_game(creator: string, number_of_players: number) {
     const new_game = Model.create_pending(creator, number_of_players)

@@ -23,15 +23,12 @@ function findBonus(player_scores: { slot: string; score: number | null }[]) {
 }
 
 function upper_section_scores(player_scores: { slot: string; score: number | null }[]): any {
-  const scores: any = {}
-  const player_scores_numbered = player_scores.map(({slot, score}) => ({slot: parseInt(slot), score}))
-  for(let {slot, score} of player_scores_numbered) {
-    if (isDieValue(slot)) {
-      if (typeof score !== 'number') continue
-      scores[slot] = score
-    }
-  }
-  return scores
+  const scores = player_scores
+    .map(({ slot, score }) => ({ slot: parseInt(slot), score }))
+    .filter(score => isDieValue(score.slot))
+    .filter(score => typeof score.score === 'number')
+    .map(({slot, score}) => [slot, score])
+  return Object.fromEntries(scores)
 }    
 
 function lower_section_scores(player_scores: { slot: string; score: number | null }[]): any {
