@@ -3,7 +3,8 @@ import { type GraphQlGame, type IndexedYahtzee, type IndexedYahtzeeSpecs, from_g
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import type { SlotKey } from "domain/src/model/yahtzee.score";
+import type { SlotKey } from "domain/src/model/yahtzee.score"
+import * as _ from 'lodash/fp'
 
 const wsLink = new GraphQLWsLink(createClient({
   url: 'ws://localhost:4000/graphql',
@@ -138,7 +139,7 @@ export async function pending_games(): Promise<IndexedYahtzeeSpecs[]> {
     }
   }`)
   const games: Pick<IndexedYahtzeeSpecs, 'id' | 'players'>[] = await response.pending_games;
-  return games.map(g => ({...g, pending: true}))
+  return games.map(_.set('pending', true)) as IndexedYahtzeeSpecs[]
 }
 
 export async function pending_game(id: string): Promise<IndexedYahtzeeSpecs | undefined> {

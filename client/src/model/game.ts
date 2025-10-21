@@ -1,6 +1,7 @@
 import { isDieValue, type DieValue } from "domain/src/model/dice"
 import { type PlayerScore, type Yahtzee, type YahtzeeSpecs } from "domain/src/model/yahtzee.game"
 import { isLowerSection, type LowerSection, type UpperSection } from "domain/src/model/yahtzee.score"
+import * as _ from 'lodash/fp'
 
 type Indexed<Y, pending extends boolean> = Readonly<Y & {id: string, pending: pending}>
 
@@ -23,11 +24,11 @@ function findBonus(player_scores: { slot: string; score: number | null }[]) {
 }
 
 function upper_section_scores(player_scores: { slot: string; score: number | null }[]): any {
-  const scores = player_scores
-    .map(({ slot, score }) => ({ slot: parseInt(slot), score }))
-    .filter(score => isDieValue(score.slot))
-    .filter(score => typeof score.score === 'number')
-    .map(({slot, score}) => [slot, score])
+  const scores = _.flow([_.map(_.update('slot', parseInt)),
+    _.filter(_.flow([_.prop('slot'), isDieValue])),
+    _.filter((s: {slot: string, score?: number}) => typeof s.score === 'number'),
+    _.map(_.juxt([_.prop('slot'), _.prop('score')]))
+  ])(player_scores)
   return Object.fromEntries(scores)
 }    
 
