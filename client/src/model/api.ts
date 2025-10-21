@@ -255,6 +255,6 @@ export async function register(game: IndexedYahtzee, slot: SlotKey, player: stri
         }
       }
     }`, { id: game.id, slot: slot.toString(), player })
-  const updatedGame = response.reroll
+  const updatedGame = response.register
   return from_graphql_game(updatedGame)
 }

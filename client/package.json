@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.13.9",
+    "@vitejs/plugin-vue": "^6.0.1",
     "domain": "../domain",
     "graphql": "^16.11.0",
     "graphql-ws": "^6.0.6",
