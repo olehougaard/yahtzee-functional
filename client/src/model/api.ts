@@ -117,9 +117,10 @@ export async function pending_games(): Promise<IndexedYahtzeeSpecs[]> {
     pending_games {
       id
       players
+      number_of_players
     }
   }`) as {pending_games: IndexedYahtzeeSpecs[]}
-  const games: Pick<IndexedYahtzeeSpecs, 'id' | 'players'>[] = await response.pending_games;
+const games: Pick<IndexedYahtzeeSpecs, 'id' | 'players' | 'number_of_players'>[] = await response.pending_games;
   return games.map(_.set('pending', true)) as IndexedYahtzeeSpecs[]
 }
 
