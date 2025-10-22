@@ -8,7 +8,7 @@ import type { PendingGamesState } from '../slices/pending_games_slice'
 import * as _ from 'lodash/fp'
 import { is_finished } from 'domain/src/model/yahtzee.game'
 
-export default ({children}: {children: React.ReactNode}) => {
+export default function Page({children}: {children: React.ReactNode}) {
   const {player} = useSelector<State, PlayerState>(state => state.player)
   const ongoing_games = useSelector<State, OngoingGamesState>(state => state.ongoing_games)
   const pending_games = useSelector<State, PendingGamesState>(state => state.pending_games)

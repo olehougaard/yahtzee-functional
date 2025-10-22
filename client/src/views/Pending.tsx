@@ -4,19 +4,20 @@ import { useDispatch, useSelector } from "react-redux"
 import type { IndexedYahtzeeSpecs } from "../model/game"
 import type { PlayerState } from "../slices/player_slice"
 import type { Dispatch, State } from "../stores/store"
-import * as Pending from "../slices/pending_games_slice"
+import * as pending from "../slices/pending_games_slice"
 import * as _ from 'lodash/fp'
 import type { OngoingGamesState } from "../slices/ongoing_games_slice"
 import JoinThunk from "../thunks/JoinThunk"
 import { useEffect } from "react"
 
-export default () => {
+export default function Pending() {
   const params = useParams()
   const {player} = useSelector<State, PlayerState>(state => state.player)
   const ongoing_games = useSelector<State, OngoingGamesState>(state => state.ongoing_games)
   const id = params.id!
-  const game = useSelector<State, IndexedYahtzeeSpecs | undefined>(state => Pending.game(id, state.pending_games))
+  const game = useSelector<State, IndexedYahtzeeSpecs | undefined>(state => pending.game(id, state.pending_games))
   const navigate = useNavigate()
+  const dispatch: Dispatch = useDispatch()
   
   useEffect(() => {
     if (player === undefined) {
@@ -27,12 +28,11 @@ export default () => {
       else
         navigate('/')
     }
-  }, [game, player])
+  })
 
   if (player === undefined || game === undefined)
     return <></>
 
-  const dispatch: Dispatch = useDispatch()
 
   const canJoin = !game.players.some(_.equals(player))
 

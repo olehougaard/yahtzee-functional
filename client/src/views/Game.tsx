@@ -12,7 +12,7 @@ import * as _ from 'lodash/fp'
 import { useEffect } from "react"
 import './Game.css'
 
-export default () => {
+export default function Game() {
   const params = useParams()
   const {player} = useSelector<State, PlayerState>(state => state.player)
   const id = params.id!
@@ -25,7 +25,7 @@ export default () => {
     } else if (game === undefined) {
       navigate('/')
     }
-  }, [player, game])
+  })
 
   if (player === undefined || game === undefined) return <></>
 

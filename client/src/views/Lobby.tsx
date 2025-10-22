@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import { useEffect, useState } from 'react'
 import NewGameThunk from '../thunks/NewGameThunk'
 
-export default () => {
+export default function Login() {
   const {player} = useSelector<State, PlayerState>(state => state.player)
   const dispatch: Dispatch = useDispatch()
   const navigate = useNavigate()
@@ -15,7 +15,7 @@ export default () => {
     if (player === undefined) {
       navigate("/login")
     }
-  }, [player])
+  })
 
 
   const [number_of_players, set_number_of_players] = useState(2)

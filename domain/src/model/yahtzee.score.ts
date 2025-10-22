@@ -13,8 +13,10 @@ export const upper_section_slots: DieArray<Slot> = {
   [6]: number_slot(6),
 } as const
 
+export type UpperSectionScores = DieArray<number | undefined>
+
 export type UpperSection = Readonly<{
-  scores: DieArray<number | undefined>,
+  scores: UpperSectionScores,
   bonus?: 0 | 50
 }>
 
@@ -77,8 +79,10 @@ export function isLowerSection(key: any): key is LowerSectionKey {
   return lower_section_keys.indexOf(key) !== -1
 }
 
+export type LowerSectionScores = Partial<Record<LowerSectionKey, number>>
+
 export type LowerSection = {
-  scores: Partial<Record<LowerSectionKey, number>>
+  scores: LowerSectionScores
 }
 
 export function lower_section(): LowerSection {

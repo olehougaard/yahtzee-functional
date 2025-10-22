@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router"
 import LoginThunk from "../thunks/LoginThunk"
 import type { Dispatch } from "../stores/store"
 
-export default () => {
+export default function Login() {
   const dispatch: Dispatch = useDispatch()
   const navigate = useNavigate()
 

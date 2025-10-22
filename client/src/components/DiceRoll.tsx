@@ -6,7 +6,7 @@ import RerollThunk from "../thunks/RerollThunk";
 import type { Dispatch } from "../stores/store";
 import './DiceRoll.css'
 
-export default ({ game, player, enabled, className }: {game: IndexedYahtzee, player: string, enabled: boolean, className: string}) => {
+export default function DiceRoll({ game, player, enabled, className }: {game: IndexedYahtzee, player: string, enabled: boolean, className: string}) {
   const [held, setHeld] = useState([false, false, false, false, false])
   const dispatch: Dispatch = useDispatch()
   

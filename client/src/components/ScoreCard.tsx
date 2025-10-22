@@ -8,7 +8,7 @@ import type { Dispatch } from "../stores/store"
 import RegisterThunk from '../thunks/RegisterThunk'
 import './ScoreCard.css'
 
-export default ({ game, player, enabled, className }: {game: IndexedYahtzee, player: string, enabled: boolean, className: string}) => {
+export default function ScoreCard({ game, player, enabled, className }: {game: IndexedYahtzee, player: string, enabled: boolean, className: string}) {
   const dispatch: Dispatch = useDispatch()
 
   const players = game.players

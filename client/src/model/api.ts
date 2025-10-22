@@ -31,17 +31,17 @@ const apolloClient = new ApolloClient({
   cache: new InMemoryCache()
 })
 
-async function query(query: DocumentNode, variables?: Object): Promise<any> {
+async function query(query: DocumentNode, variables?: object): Promise<unknown> {
   const result = await apolloClient.query({ query, variables, fetchPolicy: 'network-only' })    
   return result.data
 }  
 
-async function mutate(mutation: DocumentNode, variables?: Object): Promise<any> {
+async function mutate(mutation: DocumentNode, variables?: object): Promise<unknown> {
   const result = await apolloClient.mutate({ mutation, variables, fetchPolicy: 'network-only' })    
   return result.data
 }  
 
-export async function onGame(subscriber: (game: IndexedYahtzee) => any) {
+export async function onGame(subscriber: (game: IndexedYahtzee) => unknown) {
   const gameSubscriptionQuery = gql`subscription GameSubscription {
     active {
       id
@@ -70,7 +70,7 @@ export async function onGame(subscriber: (game: IndexedYahtzee) => any) {
   })
 }
 
-export async function onPending(subscriber: (game: IndexedYahtzeeSpecs) => any) {
+export async function onPending(subscriber: (game: IndexedYahtzeeSpecs) => unknown) {
   const gameSubscriptionQuery = gql`subscription GameSubscription {
     pending {
       id
