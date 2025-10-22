@@ -75,30 +75,6 @@ export async function pendingRxJS() {
   return subscriptionsRxJS(apolloClient, gameSubscriptionQuery, pending)
 }
 
-export async function onPending(subscriber: (game: IndexedYahtzeeSpecs) => unknown) {
-  const gameSubscriptionQuery = gql`subscription GameSubscription {
-    pending {
-      id
-      pending
-      creator
-      players
-      number_of_players
-    }
-  }`
-  const gameObservable = apolloClient.subscribe<{pending: IndexedYahtzeeSpecs}>({ query: gameSubscriptionQuery })
-  gameObservable.subscribe({
-    next({data}) {
-      if (data) {
-        const pending: IndexedYahtzeeSpecs = data.pending
-        subscriber(pending)
-      }
-    },
-    error(err) {
-      console.error(err)
-    }
-  })
-}
-
 export async function games(): Promise<IndexedYahtzee[]> {
   const games = await query(gql`{
     games {
