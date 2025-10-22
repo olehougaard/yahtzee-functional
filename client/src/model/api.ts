@@ -5,6 +5,7 @@ import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import type { SlotKey } from "domain/src/model/yahtzee.score"
 import * as _ from 'lodash/fp'
+import { subscriptionsRxJS } from "./rxjs";
 
 const wsLink = new GraphQLWsLink(createClient({
   url: 'ws://localhost:4000/graphql',
@@ -41,7 +42,7 @@ async function mutate(mutation: DocumentNode, variables?: object): Promise<unkno
   return result.data
 }  
 
-export async function onGame(subscriber: (game: IndexedYahtzee) => unknown) {
+export async function gameRxJS() {
   const gameSubscriptionQuery = gql`subscription GameSubscription {
     active {
       id
@@ -56,18 +57,22 @@ export async function onGame(subscriber: (game: IndexedYahtzee) => unknown) {
       }
     }
   }`
-  const gameObservable = apolloClient.subscribe<{active: GraphQlGame}>({ query: gameSubscriptionQuery })
-  gameObservable.subscribe({
-    next({data}) {
-      if (data) {
-        const game: IndexedYahtzee = from_graphql_game(data.active)
-        subscriber(game)
-      }
-    },
-    error(err) {
-      console.error(err)
+  const game = (evt: {active: GraphQlGame}) => from_graphql_game(evt.active)
+  return subscriptionsRxJS(apolloClient, gameSubscriptionQuery, game)
+}
+
+export async function pendingRxJS() {
+  const gameSubscriptionQuery = gql`subscription GameSubscription {
+    pending {
+      id
+      pending
+      creator
+      players
+      number_of_players
     }
-  })
+  }`
+  const pending = ({pending}: {pending: IndexedYahtzeeSpecs}) => pending
+  return subscriptionsRxJS(apolloClient, gameSubscriptionQuery, pending)
 }
 
 export async function onPending(subscriber: (game: IndexedYahtzeeSpecs) => unknown) {

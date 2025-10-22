@@ -24,7 +24,7 @@ export default function Pending() {
       navigate(`/login?pending=${id}`)
     } else if (game === undefined) {
       if (ongoing_games.some(g => g.id === id))
-        navigate(`/login?game=${id}`)
+        navigate(`/game/${id}`)
       else
         navigate('/')
     }

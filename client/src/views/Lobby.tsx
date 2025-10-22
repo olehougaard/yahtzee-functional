@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import { useEffect, useState } from 'react'
 import NewGameThunk from '../thunks/NewGameThunk'
 
-export default function Login() {
+export default function Lobby() {
   const {player} = useSelector<State, PlayerState>(state => state.player)
   const dispatch: Dispatch = useDispatch()
   const navigate = useNavigate()
