@@ -95,7 +95,7 @@ export async function onPending(subscriber: (game: IndexedYahtzeeSpecs) => unkno
 }
 
 export async function games(): Promise<IndexedYahtzee[]> {
-  const memento = await query(gql`{
+  const games = await query(gql`{
     games {
       id
       players
@@ -107,8 +107,8 @@ export async function games(): Promise<IndexedYahtzee[]> {
         slot
       }
     }
-  }`)
-  return memento.games.map(from_graphql_game)
+  }`) as {games: GraphQlGame[]}
+  return games.games.map(from_graphql_game)
 }
 
 export async function game(id: string): Promise<IndexedYahtzee | undefined> {
@@ -125,7 +125,7 @@ export async function game(id: string): Promise<IndexedYahtzee | undefined> {
           slot
         }
       }
-    }`, {id})
+    }`, {id}) as {game?: GraphQlGame}
   if (response.game === undefined)
     return undefined
   return from_graphql_game(response.game)
@@ -137,7 +137,7 @@ export async function pending_games(): Promise<IndexedYahtzeeSpecs[]> {
       id
       players
     }
-  }`)
+  }`) as {pending_games: IndexedYahtzeeSpecs[]}
   const games: Pick<IndexedYahtzeeSpecs, 'id' | 'players'>[] = await response.pending_games;
   return games.map(_.set('pending', true)) as IndexedYahtzeeSpecs[]
 }
@@ -152,8 +152,8 @@ export async function pending_game(id: string): Promise<IndexedYahtzeeSpecs | un
         creator
         players
       }
-    }`, {id})
-    return await response.pending_games
+    }`, {id}) as {pending_game?: IndexedYahtzeeSpecs}
+    return await response.pending_game
 }
 
 export async function new_game(number_of_players: number, player: string): Promise<IndexedYahtzeeSpecs|IndexedYahtzee> {
@@ -180,7 +180,7 @@ export async function new_game(number_of_players: number, player: string): Promi
         }
       }    
     }
-  }`, { creator: player, numberOfPlayers: number_of_players })
+  }`, { creator: player, numberOfPlayers: number_of_players }) as {new_game: IndexedYahtzeeSpecs | GraphQlGame }
   const game = response.new_game
   if (game.pending)
     return game as IndexedYahtzeeSpecs
@@ -212,7 +212,7 @@ export async function join(game: IndexedYahtzeeSpecs, player: string): Promise<I
         }
       }    
     }
-  }`, { id: game.id, player })
+  }`, { id: game.id, player }) as {join: IndexedYahtzeeSpecs | GraphQlGame}
   const joinedGame = response.join
   if (joinedGame.pending)
     return joinedGame as IndexedYahtzeeSpecs
@@ -235,7 +235,7 @@ export async function reroll(game: IndexedYahtzee, held: number[], player: strin
           score
         }
       }
-    }`, { id: game.id, held, player })
+    }`, { id: game.id, held, player }) as { reroll: GraphQlGame }
   const updatedGame = response.reroll
   return from_graphql_game(updatedGame)
 }
@@ -255,7 +255,7 @@ export async function register(game: IndexedYahtzee, slot: SlotKey, player: stri
           score
         }
       }
-    }`, { id: game.id, slot: slot.toString(), player })
+    }`, { id: game.id, slot: slot.toString(), player }) as { register: GraphQlGame }
   const updatedGame = response.register
   return from_graphql_game(updatedGame)
 }

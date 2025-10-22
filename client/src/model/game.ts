@@ -10,7 +10,8 @@ export type IndexedYahtzee = Indexed<Omit<Yahtzee, 'roller'>, false>
 export type IndexedYahtzeeSpecs = Indexed<YahtzeeSpecs, true>
 
 export type GraphQlGame = Readonly<{ 
-  id: string, 
+  id: string,
+  pending: false, 
   players: string[], 
   playerInTurn: number, 
   roll: DieValue[], 
